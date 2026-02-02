@@ -20,6 +20,13 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { useForm } from "react-hook-form";
@@ -28,6 +35,7 @@ import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { Edit2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Wallet } from "@/types/prisma";
 
 const TransactionSchema = z.object({
     amount: z.number().positive("Jumlah harus lebih dari 0"),
@@ -35,16 +43,18 @@ const TransactionSchema = z.object({
     source: z.string().optional(),
     category: z.string().optional(),
     description: z.string().optional(),
+    walletId: z.string().min(1, "Dompet wajib dipilih"),
 });
 
 interface EditTransactionDialogProps {
     transaction: Transaction;
+    wallets: Wallet[];
     open?: boolean;
     onOpenChange?: (open: boolean) => void;
     trigger?: React.ReactNode;
 }
 
-export function EditTransactionDialog({ transaction, open: externalOpen, onOpenChange: setExternalOpen, trigger }: EditTransactionDialogProps) {
+export function EditTransactionDialog({ transaction, wallets, open: externalOpen, onOpenChange: setExternalOpen, trigger }: EditTransactionDialogProps) {
     const [internalOpen, setInternalOpen] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
@@ -62,6 +72,7 @@ export function EditTransactionDialog({ transaction, open: externalOpen, onOpenC
             source: transaction.source || "",
             category: transaction.category || "",
             description: transaction.description || "",
+            walletId: transaction.walletId,
         },
     });
 
@@ -73,7 +84,6 @@ export function EditTransactionDialog({ transaction, open: externalOpen, onOpenC
 
         const result = await updateTransaction(transaction.id, {
             ...values,
-            walletId: transaction.walletId,
             type: transaction.type,
             date: new Date(values.date),
         });
@@ -119,6 +129,30 @@ export function EditTransactionDialog({ transaction, open: externalOpen, onOpenC
                 <div className="p-8">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                            <FormField
+                                control={form.control}
+                                name="walletId"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-1.5">
+                                        <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Dompet</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="bg-slate-50 border-none h-12 rounded-2xl focus-visible:ring-primary/20 font-medium">
+                                                    <SelectValue placeholder="Pilih dompet" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {wallets.map((wallet) => (
+                                                    <SelectItem key={wallet.id} value={wallet.id}>
+                                                        {wallet.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <FormField
                                 control={form.control}
                                 name="date"

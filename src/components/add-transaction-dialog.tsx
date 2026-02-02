@@ -20,6 +20,13 @@ import {
     FormLabel,
     FormMessage,
 } from "@/components/ui/form";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { CurrencyInput } from "@/components/ui/currency-input";
 import { useForm } from "react-hook-form";
@@ -28,6 +35,7 @@ import * as z from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { PlusCircle, MinusCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { Wallet } from "@/types/prisma";
 
 const TransactionSchema = z.object({
     amount: z.number().positive("Jumlah harus lebih dari 0"),
@@ -35,14 +43,16 @@ const TransactionSchema = z.object({
     source: z.string().optional(),
     category: z.string().optional(),
     description: z.string().optional(),
+    walletId: z.string().min(1, "Dompet wajib dipilih"),
 });
 
 interface AddTransactionDialogProps {
     walletId: string;
+    wallets: Wallet[];
     type: TransactionType;
 }
 
-export function AddTransactionDialog({ walletId, type }: AddTransactionDialogProps) {
+export function AddTransactionDialog({ walletId, wallets, type }: AddTransactionDialogProps) {
     const [open, setOpen] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
@@ -56,6 +66,7 @@ export function AddTransactionDialog({ walletId, type }: AddTransactionDialogPro
             source: "",
             category: "",
             description: "",
+            walletId: walletId,
         },
     });
 
@@ -67,7 +78,6 @@ export function AddTransactionDialog({ walletId, type }: AddTransactionDialogPro
 
         const result = await createTransaction({
             ...values,
-            walletId,
             type,
             date: new Date(values.date),
         });
@@ -120,6 +130,30 @@ export function AddTransactionDialog({ walletId, type }: AddTransactionDialogPro
                 <div className="p-8">
                     <Form {...form}>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                            <FormField
+                                control={form.control}
+                                name="walletId"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-1.5">
+                                        <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Dompet</FormLabel>
+                                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                            <FormControl>
+                                                <SelectTrigger className="bg-slate-50 border-none h-12 rounded-2xl focus-visible:ring-primary/20 font-medium">
+                                                    <SelectValue placeholder="Pilih dompet" />
+                                                </SelectTrigger>
+                                            </FormControl>
+                                            <SelectContent>
+                                                {wallets.map((wallet) => (
+                                                    <SelectItem key={wallet.id} value={wallet.id}>
+                                                        {wallet.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                             <FormField
                                 control={form.control}
                                 name="date"

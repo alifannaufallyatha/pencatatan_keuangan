@@ -37,6 +37,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Eye, Edit2 } from "lucide-react";
 
+import { TransactionChart } from "@/components/transaction-chart";
+
 export default function PersonalFinancePage() {
     const [wallets, setWallets] = useState<Wallet[]>([]);
     const [selectedWalletId, setSelectedWalletId] = useState<string>("");
@@ -44,6 +46,7 @@ export default function PersonalFinancePage() {
     const [filterDate, setFilterDate] = useState<string>(format(new Date(), "yyyy-MM-dd"));
     const [filterMonth, setFilterMonth] = useState<string>("all");
     const [filterYear, setFilterYear] = useState<string>(new Date().getFullYear().toString());
+    const [filterType, setFilterType] = useState<string>("all");
 
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
@@ -85,6 +88,11 @@ export default function PersonalFinancePage() {
         const intervalId = setInterval(fetchTransactions, 30000);
         return () => clearInterval(intervalId);
     }, [selectedWalletId, filterDate, filterMonth, filterYear]);
+
+    const filteredTransactions = transactions.filter((t) => {
+        if (filterType === "all") return true;
+        return t.type === filterType;
+    });
 
     const totalIncome = transactions
         .filter((t) => t.type === TransactionType.INCOME)
@@ -144,8 +152,8 @@ export default function PersonalFinancePage() {
                     <div className="flex flex-col gap-2 pt-2">
                         {selectedWalletId && (
                             <>
-                                <AddTransactionDialog walletId={selectedWalletId} type={TransactionType.INCOME} />
-                                <AddTransactionDialog walletId={selectedWalletId} type={TransactionType.EXPENSE} />
+                                <AddTransactionDialog walletId={selectedWalletId} wallets={wallets} type={TransactionType.INCOME} />
+                                <AddTransactionDialog walletId={selectedWalletId} wallets={wallets} type={TransactionType.EXPENSE} />
                             </>
                         )}
                     </div>
@@ -153,6 +161,11 @@ export default function PersonalFinancePage() {
 
                 {/* Main Content Area */}
                 <div className="lg:col-span-3 space-y-6">
+                    {/* Chart Section */}
+                    <div className="h-[300px]">
+                        <TransactionChart transactions={transactions} />
+                    </div>
+
                     {/* Toolbar */}
                     <Card className="border-none shadow-sm bg-white overflow-hidden">
                         <div className="p-1 bg-slate-50 border-b flex items-center px-4 py-2 gap-2">
@@ -173,6 +186,19 @@ export default function PersonalFinancePage() {
                                                     {w.name}
                                                 </SelectItem>
                                             ))}
+                                        </SelectContent>
+                                    </Select>
+                                </div>
+                                <div className="flex-1 min-w-[150px]">
+                                    <label className="text-[10px] font-bold text-slate-400 uppercase mb-1.5 block">Tipe Transaksi</label>
+                                    <Select value={filterType} onValueChange={setFilterType}>
+                                        <SelectTrigger className="bg-slate-50 border-none h-10">
+                                            <SelectValue placeholder="Semua" />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectItem value="all">Semua</SelectItem>
+                                            <SelectItem value={TransactionType.INCOME}>Pemasukan</SelectItem>
+                                            <SelectItem value={TransactionType.EXPENSE}>Pengeluaran</SelectItem>
                                         </SelectContent>
                                     </Select>
                                 </div>
@@ -230,7 +256,7 @@ export default function PersonalFinancePage() {
                         <div className="p-4 border-b bg-white flex justify-between items-center">
                             <h3 className="font-bold text-slate-800">Riwayat Transaksi</h3>
                             <div className="text-[10px] font-medium px-2 py-1 bg-slate-100 rounded text-slate-500">
-                                {transactions.length} Transaksi
+                                {filteredTransactions.length} Transaksi
                             </div>
                         </div>
                         <CardContent className="p-0">
@@ -244,14 +270,14 @@ export default function PersonalFinancePage() {
                                         </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                        {transactions.length === 0 ? (
+                                        {filteredTransactions.length === 0 ? (
                                             <TableRow>
                                                 <TableCell colSpan={3} className="text-center py-12 text-slate-400 text-sm">
                                                     Belum ada transaksi di periode ini.
                                                 </TableCell>
                                             </TableRow>
                                         ) : (
-                                            transactions.map((t, index) => (
+                                            filteredTransactions.map((t, index) => (
                                                 <TableRow key={t.id} className={cn(
                                                     "hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0",
                                                 )}>
@@ -305,6 +331,7 @@ export default function PersonalFinancePage() {
             {selectedTransaction && (
                 <EditTransactionDialog
                     transaction={selectedTransaction}
+                    wallets={wallets}
                     open={isEditOpen}
                     onOpenChange={setIsEditOpen}
                 />

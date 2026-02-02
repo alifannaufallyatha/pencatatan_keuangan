@@ -24,6 +24,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
 import { Stethoscope, TrendingUp, Calendar, Filter } from "lucide-react";
+import { ClinicChart } from "@/components/clinic-chart";
 
 export default function ClinicFinancePage() {
     const [transactions, setTransactions] = useState<ClinicTransaction[]>([]);
@@ -160,6 +161,11 @@ export default function ClinicFinancePage() {
 
                 {/* Main Table Content */}
                 <div className="lg:col-span-3 space-y-6">
+                    {/* Chart Section */}
+                    <div className="h-[350px]">
+                        <ClinicChart transactions={transactions} filterDate={filterDate} />
+                    </div>
+
                     <Card className="border-none shadow-sm overflow-hidden min-h-[400px]">
                         <div className="p-4 border-b bg-white flex justify-between items-center">
                             <h3 className="font-bold text-slate-800">Riwayat Tindakan</h3>
