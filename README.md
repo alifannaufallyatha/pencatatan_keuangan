@@ -1,4 +1,4 @@
-# Sistem Pencatatan Keuangan & Klinik (SCB)
+# Sistem Pencatatan Keuangan & Klinik 
 
 Aplikasi Web Terintegrasi untuk manajemen keuangan pribadi dan pencatatan pendapatan klinik, dibangun dengan teknologi web modern untuk performa tinggi dan pengalaman pengguna yang seamless.
 
