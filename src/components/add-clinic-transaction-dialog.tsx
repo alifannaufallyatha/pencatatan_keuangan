@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClinicTransaction } from "@/app/actions/clinic";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -36,6 +38,7 @@ const ClinicTransactionSchema = z.object({
 export function AddClinicTransactionDialog() {
     const [open, setOpen] = useState(false);
     const { toast } = useToast();
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof ClinicTransactionSchema>>({
         resolver: zodResolver(ClinicTransactionSchema),
@@ -67,6 +70,7 @@ export function AddClinicTransactionDialog() {
             });
             form.reset();
             setOpen(false);
+            router.refresh();
         }
     };
 
@@ -108,16 +112,12 @@ export function AddClinicTransactionDialog() {
                                     <FormItem className="space-y-1.5">
                                         <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Biaya Tindakan (Rp)</FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">Rp</span>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="0"
-                                                    className="bg-slate-50 border-none h-14 pl-12 rounded-2xl focus-visible:ring-primary/20 text-xl font-black text-slate-800"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
-                                                />
-                                            </div>
+                                            <CurrencyInput
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                placeholder="0"
+                                                className="bg-slate-50 border-none h-14 rounded-2xl focus-visible:ring-primary/20"
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

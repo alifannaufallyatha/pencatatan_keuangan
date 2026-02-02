@@ -21,6 +21,7 @@ import {
     FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { CurrencyInput } from "@/components/ui/currency-input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -138,16 +139,12 @@ export function EditTransactionDialog({ transaction, open: externalOpen, onOpenC
                                     <FormItem className="space-y-1.5">
                                         <FormLabel className="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1">Jumlah (Rp)</FormLabel>
                                         <FormControl>
-                                            <div className="relative">
-                                                <span className="absolute left-4 top-1/2 -translate-y-1/2 font-bold text-slate-400">Rp</span>
-                                                <Input
-                                                    type="number"
-                                                    placeholder="0"
-                                                    className="bg-slate-50 border-none h-14 pl-12 rounded-2xl focus-visible:ring-primary/20 text-xl font-black text-slate-800"
-                                                    {...field}
-                                                    onChange={(e) => field.onChange(Number(e.target.value))}
-                                                />
-                                            </div>
+                                            <CurrencyInput
+                                                value={field.value}
+                                                onChange={field.onChange}
+                                                placeholder="0"
+                                                className="bg-slate-50 border-none h-14 rounded-2xl focus-visible:ring-primary/20"
+                                            />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
