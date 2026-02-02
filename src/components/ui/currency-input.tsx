@@ -15,10 +15,8 @@ export const CurrencyInput = React.forwardRef<HTMLInputElement, CurrencyInputPro
         // Format number to IDR string
         const formatValue = (val: number) => {
             if (!val && val !== 0) return "";
-            return new Intl.NumberFormat("id-ID", {
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0,
-            }).format(val);
+            // Manual formatting to ensure consistent dot separator independent of server locale
+            return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
         };
 
         const [displayValue, setDisplayValue] = React.useState(formatValue(value));
