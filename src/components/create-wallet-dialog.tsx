@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createWallet } from "@/app/actions/wallets";
 import { Button } from "@/components/ui/button";
 import {
@@ -22,6 +23,7 @@ export function CreateWalletDialog() {
     const [name, setName] = useState("");
     const [loading, setLoading] = useState(false);
     const { toast } = useToast();
+    const router = useRouter();
 
     const handleCreate = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -44,6 +46,7 @@ export function CreateWalletDialog() {
             });
             setName("");
             setOpen(false);
+            router.refresh(); // Refresh data tanpa reload halaman
         }
     };
 

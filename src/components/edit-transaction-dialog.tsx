@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { TransactionType, Transaction } from "@prisma/client";
 import { updateTransaction } from "@/app/actions/transactions";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ interface EditTransactionDialogProps {
 export function EditTransactionDialog({ transaction, open: externalOpen, onOpenChange: setExternalOpen, trigger }: EditTransactionDialogProps) {
     const [internalOpen, setInternalOpen] = useState(false);
     const { toast } = useToast();
+    const router = useRouter();
 
     const open = externalOpen !== undefined ? externalOpen : internalOpen;
     const setOpen = setExternalOpen !== undefined ? setExternalOpen : setInternalOpen;
@@ -87,6 +89,7 @@ export function EditTransactionDialog({ transaction, open: externalOpen, onOpenC
                 description: `Berhasil memperbarui ${isIncome ? "pemasukan" : "pengeluaran"}`,
             });
             setOpen(false);
+            router.refresh(); // Refresh data tanpa reload halaman
         }
     };
 

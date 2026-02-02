@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { TransactionType } from "@prisma/client";
 import { createTransaction } from "@/app/actions/transactions";
 import { Button } from "@/components/ui/button";
@@ -43,6 +44,7 @@ interface AddTransactionDialogProps {
 export function AddTransactionDialog({ walletId, type }: AddTransactionDialogProps) {
     const [open, setOpen] = useState(false);
     const { toast } = useToast();
+    const router = useRouter();
     const isIncome = type === TransactionType.INCOME;
 
     const form = useForm<z.infer<typeof TransactionSchema>>({
@@ -82,6 +84,7 @@ export function AddTransactionDialog({ walletId, type }: AddTransactionDialogPro
             });
             form.reset();
             setOpen(false);
+            router.refresh(); // Refresh data tanpa reload halaman
         }
     };
 
