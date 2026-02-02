@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { getWallets } from "@/app/actions/wallets";
 import { getTransactions } from "@/app/actions/transactions";
-import { Transaction, TransactionType, Wallet } from "@prisma/client";
+import { Transaction, TransactionType, Wallet } from "@/types/prisma";
 import { CreateWalletDialog } from "@/components/create-wallet-dialog";
 import { AddTransactionDialog } from "@/components/add-transaction-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
