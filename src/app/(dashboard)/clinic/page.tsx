@@ -23,14 +23,25 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { format } from "date-fns";
-import { Stethoscope, TrendingUp, Calendar, Filter } from "lucide-react";
+import { Stethoscope, TrendingUp, Calendar, Filter, MoreHorizontal, Eye, Edit2 } from "lucide-react";
 import { ClinicChart } from "@/components/clinic-chart";
+import { ClinicTransactionDetailDialog } from "@/components/clinic-transaction-detail-dialog";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 export default function ClinicFinancePage() {
     const [transactions, setTransactions] = useState<ClinicTransaction[]>([]);
     const [filterDate, setFilterDate] = useState<string>(format(new Date(), "yyyy-MM-dd"));
     const [filterMonth, setFilterMonth] = useState<string>("all");
     const [filterYear, setFilterYear] = useState<string>(new Date().getFullYear().toString());
+
+    const [isEditOpen, setIsEditOpen] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState<ClinicTransaction | null>(null);
 
     const fetchTransactions = async () => {
         const filters: any = {};
@@ -213,7 +224,31 @@ export default function ClinicFinancePage() {
                                                         Rp {t.fee.toLocaleString()}
                                                     </TableCell>
                                                     <TableCell className="py-4 text-center px-6">
-                                                        <EditClinicTransactionDialog transaction={t} />
+                                                        <DropdownMenu>
+                                                            <DropdownMenuTrigger asChild>
+                                                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                                                    <MoreHorizontal className="h-4 w-4" />
+                                                                </Button>
+                                                            </DropdownMenuTrigger>
+                                                            <DropdownMenuContent align="end" className="rounded-xl border-none shadow-xl p-1">
+                                                                <ClinicTransactionDetailDialog transaction={t} trigger={
+                                                                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="rounded-lg gap-2 cursor-pointer">
+                                                                        <Eye className="w-4 h-4 text-slate-400" />
+                                                                        <span>Detail</span>
+                                                                    </DropdownMenuItem>
+                                                                } />
+                                                                <DropdownMenuItem
+                                                                    className="rounded-lg gap-2 cursor-pointer text-indigo-600"
+                                                                    onSelect={() => {
+                                                                        setSelectedTransaction(t);
+                                                                        setIsEditOpen(true);
+                                                                    }}
+                                                                >
+                                                                    <Edit2 className="w-4 h-4" />
+                                                                    <span>Edit</span>
+                                                                </DropdownMenuItem>
+                                                            </DropdownMenuContent>
+                                                        </DropdownMenu>
                                                     </TableCell>
                                                 </TableRow>
                                             ))
@@ -225,6 +260,14 @@ export default function ClinicFinancePage() {
                     </Card>
                 </div>
             </div>
+
+            {selectedTransaction && (
+                <EditClinicTransactionDialog
+                    transaction={selectedTransaction}
+                    open={isEditOpen}
+                    onOpenChange={setIsEditOpen}
+                />
+            )}
         </div>
     );
 }

@@ -39,12 +39,18 @@ const ClinicTransactionSchema = z.object({
 
 interface EditClinicTransactionDialogProps {
     transaction: ClinicTransaction;
+    open?: boolean;
+    onOpenChange?: (open: boolean) => void;
+    trigger?: React.ReactNode;
 }
 
-export function EditClinicTransactionDialog({ transaction }: EditClinicTransactionDialogProps) {
-    const [open, setOpen] = useState(false);
+export function EditClinicTransactionDialog({ transaction, open: externalOpen, onOpenChange: setExternalOpen, trigger }: EditClinicTransactionDialogProps) {
+    const [internalOpen, setInternalOpen] = useState(false);
     const { toast } = useToast();
     const router = useRouter();
+
+    const open = externalOpen !== undefined ? externalOpen : internalOpen;
+    const setOpen = setExternalOpen !== undefined ? setExternalOpen : setInternalOpen;
 
     const form = useForm<z.infer<typeof ClinicTransactionSchema>>({
         resolver: zodResolver(ClinicTransactionSchema),
@@ -81,11 +87,14 @@ export function EditClinicTransactionDialog({ transaction }: EditClinicTransacti
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary">
-                    <Edit2 className="w-4 h-4" />
-                </Button>
-            </DialogTrigger>
+            {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
+            {!trigger && (
+                <DialogTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-primary">
+                        <Edit2 className="w-4 h-4" />
+                    </Button>
+                </DialogTrigger>
+            )}
             <DialogContent className="sm:max-w-[425px] rounded-3xl border-none shadow-2xl p-0 overflow-hidden">
                 <div className="p-6 text-white bg-gradient-to-br from-indigo-500 to-indigo-600">
                     <DialogHeader>
