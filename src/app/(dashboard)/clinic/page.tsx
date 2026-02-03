@@ -26,6 +26,7 @@ import { format } from "date-fns";
 import { Stethoscope, TrendingUp, Calendar, Filter, MoreHorizontal, Eye, Edit2 } from "lucide-react";
 import { ClinicChart } from "@/components/clinic-chart";
 import { ClinicTransactionDetailDialog } from "@/components/clinic-transaction-detail-dialog";
+import { ExportClinicButton } from "@/components/export-clinic-button";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -179,10 +180,13 @@ export default function ClinicFinancePage() {
 
                     <Card className="border-none shadow-sm overflow-hidden min-h-[400px]">
                         <div className="p-4 border-b bg-white flex justify-between items-center">
-                            <h3 className="font-bold text-slate-800">Riwayat Tindakan</h3>
-                            <div className="text-[10px] font-medium px-2 py-1 bg-slate-100 rounded text-slate-500">
-                                {transactions.length} Tindakan
+                            <div className="flex items-center gap-3">
+                                <h3 className="font-bold text-slate-800">Riwayat Tindakan</h3>
+                                <div className="text-[10px] font-medium px-2 py-1 bg-slate-100 rounded text-slate-500">
+                                    {transactions.length} Tindakan
+                                </div>
                             </div>
+                            <ExportClinicButton transactions={transactions} />
                         </div>
                         <CardContent className="p-0">
                             <div className="overflow-x-auto">
